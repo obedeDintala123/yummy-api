@@ -16,10 +16,13 @@ server.get("/", async () => {
   return { status: "API rodando com Fastify + TypeScript!" };
 });
 
-server.listen({ port: 3001 }, (err, address) => {
-  if (err) {
-    server.log.error(err);
-    process.exit(1);
+server.listen(
+  { port: 3001, host: "0.0.0.0" },
+  (err, address) => {
+    if (err) {
+      server.log.error(err);
+      process.exit(1);
+    }
+    server.log.info(`Servidor rodando em ${address}`);
   }
-  server.log.info(`Servidor rodando em ${address}`);
-});
+);
