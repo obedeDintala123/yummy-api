@@ -53,6 +53,6 @@ export const getAllReservations = async (
     });
     return reply.send(reservations);
   } catch (error) {
-    return reply.status(500).send({ error: "Failed to fetch reservations" });
+    return reply.status(500).send({ error: "Failed to fetch reservations " });
   }
 };
