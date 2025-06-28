@@ -7,11 +7,11 @@ export const createMenuItem = async (
   request: FastifyRequest,
   reply: FastifyReply
 ) => {
-  const { image, name, description, price } = request.body as any;
+  const { src, title, description, price } = request.body as any;
 
   try {
     const item = await prisma.menu.create({
-      data: { image, name, description, price }
+      data: { src, title, description, price }
     });
 
     return reply.status(201).send(item);
