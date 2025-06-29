@@ -35,6 +35,8 @@ export const createReservation = async (
       }
     });
 
+    console.log(reservation);
+
     return reply.status(201).send(reservation);
   } catch (error) {
     return reply
