@@ -9,7 +9,6 @@ export const createReservation = async (
 ) => {
   const { userId, date, peopleCount } = request.body as any;
 
-  // Verificação dos campos obrigatórios
   if (
     !userId ||
     !date ||
@@ -24,9 +23,19 @@ export const createReservation = async (
     });
   }
 
-  console.log(request.body);
-
   try {
+
+    const userExists = await prisma.user.findUnique({
+      where: { id: userId }
+    });
+
+    if (!userExists) {
+      return reply.status(404).send({
+        error: "User not found",
+        message: `User not found`
+      });
+    }
+
     const reservation = await prisma.reservation.create({
       data: {
         userId,
@@ -35,13 +44,12 @@ export const createReservation = async (
       }
     });
 
-    console.log(reservation);
-
     return reply.status(201).send(reservation);
   } catch (error) {
-    return reply
-      .status(500)
-      .send({ error: "Failed to create reservation", message: error });
+    return reply.status(500).send({
+      error: "Failed to create reservation",
+      message: error instanceof Error ? error.message : String(error)
+    });
   }
 };
 

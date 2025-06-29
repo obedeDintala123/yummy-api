@@ -43,7 +43,6 @@ model Order {
   date           DateTime
   productName    String
   price          Float
-  status         String
   createdAt      DateTime  @default(now())
 
   userId         Int

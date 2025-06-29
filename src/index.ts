@@ -3,6 +3,7 @@ import cors from "@fastify/cors";
 import { userRoutes } from "./routes/userRoutes";
 import { menuRoutes } from "./routes/menuRoutes";
 import { reservationRoutes } from "./routes/reservationRoutes";
+import { orderRoutes } from "./routes/orderRoutes";
 
 const server = fastify({ logger: true });
 
@@ -13,6 +14,7 @@ server.register(cors, {
 server.register(userRoutes, { prefix: "/auth" });
 server.register(menuRoutes, { prefix: "/api" });
 server.register(reservationRoutes, { prefix: "/api" });
+server.register(orderRoutes, { prefix: "/api" });
 
 server.get("/", async () => {
   return { status: "API rodando com Fastify + TypeScript!" };
