@@ -55,6 +55,36 @@ export const createOrder = async (
   }
 };
 
+export const getOrdersByUserId = async (
+  request: FastifyRequest,
+  reply: FastifyReply
+) => {
+  try {
+    const { id } = request.params as { id: string };
+
+    if (!id) {
+      return reply.status(400).send({ message: "User ID is required" });
+    }
+
+    const numericId = Number(id);
+    if (isNaN(numericId)) {
+      return reply.status(400).send({ message: "Invalid user ID format" });
+    }
+
+    const orders = await prisma.order.findMany({
+      where: { userId: numericId },
+      include: { user: true },
+      orderBy: { createdAt: "desc" }
+    });
+
+    return reply.send(orders);
+  } catch (error) {
+    return reply
+      .status(500)
+      .send({ error: "Failed to fetch user orders", details: error });
+  }
+};
+
 export const getAllOrders = async (
   request: FastifyRequest,
   reply: FastifyReply

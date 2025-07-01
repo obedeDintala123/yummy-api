@@ -52,6 +52,35 @@ export const createReservation = async (
   }
 };
 
+export const getReservationByUserId = async (
+  request: FastifyRequest,
+  reply: FastifyReply
+) => {
+  const { id } = request.params as { id: string };
+
+  if (!id) {
+    return reply.status(400).send({ message: "User ID is required" });
+  }
+
+  const numericId = Number(id);
+  if (isNaN(numericId)) {
+    return reply.status(400).send({ message: "Invalid user ID format" });
+  }
+
+  try {
+    const reservations = await prisma.reservation.findMany({
+      where: { userId: numericId },
+      include: { user: true },
+      orderBy: {
+        createdAt: "desc"
+      }
+    });
+    return reply.send(reservations);
+  } catch (error) {
+    return reply.status(500).send({ error: "Failed to fetch reservations" });
+  }
+};
+
 export const getAllReservations = async (
   request: FastifyRequest,
   reply: FastifyReply

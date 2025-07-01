@@ -1,32 +1,44 @@
+import dotenv from "dotenv";
 import { FastifyRequest, FastifyReply } from "fastify";
 import { PrismaClient } from "@prisma/client";
+import jwt from "jsonwebtoken";
 
+dotenv.config();
 const prisma = new PrismaClient();
+
+const JWT_SECRET = process.env.JWT_SECRET!;
 
 export async function getDashboardData(
   request: FastifyRequest,
   reply: FastifyReply
 ) {
   try {
-    // 1. Obter apenas 4 menus diferentes (excluindo duplicados pelo título)
+    const authHeader = request.headers.authorization;
+
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return reply.status(401).send({ message: "Unauthorized" });
+    }
+
+    const token = authHeader.split(" ")[1];
+
+    const decoded = jwt.verify(token, JWT_SECRET) as { userId: number };
+
+    const userId = decoded.userId;
+
     const menus = await prisma.menu.findMany({
       take: 4,
-      distinct: ["title"] // ou 'name' dependendo do campo único
+      distinct: ["title"]
     });
 
-    // 2. Obter os 2 pedidos (orders) mais recentes
     const recentOrders = await prisma.order.findMany({
-      orderBy: {
-        createdAt: "desc"
-      },
+      where: { userId },
+      orderBy: { createdAt: "desc" },
       take: 2
     });
 
-    // 3. Obter a reserva (reservation) mais recente
     const recentReservation = await prisma.reservation.findFirst({
-      orderBy: {
-        createdAt: "desc"
-      }
+      where: { userId },
+      orderBy: { createdAt: "desc" }
     });
 
     return reply.send({
@@ -35,9 +47,9 @@ export async function getDashboardData(
       recentReservation
     });
   } catch (error) {
-    request.log.error(error);
-    return reply
-      .status(500)
-      .send({ error: "Erro ao obter dados do dashboard" });
+    return reply.status(500).send({
+      error: "Erro ao obter dados do dashboard",
+      details: error
+    });
   }
 }
