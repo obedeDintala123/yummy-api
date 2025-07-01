@@ -20,6 +20,14 @@ export const createUser = async (
   } = request.body as any;
 
   try {
+    const existingUser = await prisma.user.findUnique({
+      where: { email }
+    });
+
+    if (existingUser) {
+      return reply.status(409).send({ message: "Email is already in use" });
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = await prisma.user.create({
@@ -33,9 +41,13 @@ export const createUser = async (
       }
     });
 
-    // Gera o token com nome, id e email, expira em 1 ano
     const token = jwt.sign(
-      { userId: user.id, email: user.email, name: user.name, phone: user.phone },
+      {
+        userId: user.id,
+        email: user.email,
+        name: user.name,
+        phone: user.phone
+      },
       JWT_SECRET,
       { expiresIn: "1y" }
     );
