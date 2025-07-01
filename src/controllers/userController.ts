@@ -35,7 +35,7 @@ export const createUser = async (
 
     // Gera o token com nome, id e email, expira em 1 ano
     const token = jwt.sign(
-      { userId: user.id, email: user.email, name: user.name },
+      { userId: user.id, email: user.email, name: user.name, phone: user.phone },
       JWT_SECRET,
       { expiresIn: "1y" }
     );
