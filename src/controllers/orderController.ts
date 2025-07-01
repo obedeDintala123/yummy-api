@@ -26,7 +26,6 @@ export const createOrder = async (
   }
 
   try {
-    // Verifica se o usuário existe
     const userExists = await prisma.user.findUnique({
       where: { id: userId }
     });
@@ -62,7 +61,10 @@ export const getAllOrders = async (
 ) => {
   try {
     const orders = await prisma.order.findMany({
-      include: { user: true }
+      include: { user: true },
+      orderBy: {
+        createdAt: "desc"
+      }
     });
     return reply.send(orders);
   } catch (error) {

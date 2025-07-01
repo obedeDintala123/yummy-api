@@ -24,7 +24,6 @@ export const createReservation = async (
   }
 
   try {
-
     const userExists = await prisma.user.findUnique({
       where: { id: userId }
     });
@@ -59,10 +58,13 @@ export const getAllReservations = async (
 ) => {
   try {
     const reservations = await prisma.reservation.findMany({
-      include: { user: true }
+      include: { user: true },
+      orderBy: {
+        createdAt: "desc"
+      }
     });
     return reply.send(reservations);
   } catch (error) {
-    return reply.status(500).send({ error: "Failed to fetch reservations " });
+    return reply.status(500).send({ error: "Failed to fetch reservations" });
   }
 };
