@@ -25,7 +25,7 @@ export const createUser = async (
     });
 
     if (existingUser) {
-      return reply.status(409).send({ message: "Email is already in use" });
+      return reply.status(409).send({ message: "User already exists" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
